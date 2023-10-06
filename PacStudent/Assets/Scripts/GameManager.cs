@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     public Transform pellets;
     public Pacstudent pacstudent;
 
-
+    public int ghostMultiplier { get; private set; } = 1;
     public int lives { get; private set; }
     public int score { get; private set; }
 
@@ -54,7 +54,6 @@ public class GameManager : MonoBehaviour
 
     private void GameOver()
     {
-        //gameOverText.enabled = true;
 
         for (int i = 0; i < ghosts.Length; i++)
         {
@@ -67,15 +66,24 @@ public class GameManager : MonoBehaviour
     private void SetLives(int lives)
     {
         this.lives = lives;
-        //livesText.text = "x" + lives.ToString();
     }
 
     private void SetScore(int score)
     {
         this.score = score;
-        //scoreText.text = score.ToString().PadLeft(2, '0');
     }
+    public void PelletEaten(Pellet pellet)
+    {
+        pellet.gameObject.SetActive(false);
 
+        SetScore(score + pellet.points);
+
+        if (!HasRemainingPellets())
+        {
+            pacstudent.gameObject.SetActive(false);
+            Invoke(nameof(NewRound), 3f);
+        }
+    }
     public void PacstudentEaten()
     {
         this.pacstudent.gameObject.SetActive(false);
@@ -91,14 +99,33 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void GhostEaten()
+    public void GhostEaten(Ghost ghost)
     {
-        //SetScore(this.score + points);
+        int points = ghost.points * ghostMultiplier;
+        SetScore(score + points);
 
+        ghostMultiplier++;
     }
 
-    
+    public void SupPelletEaten(SupPellet pellet)
+    {
+    }
 
-    
+    private bool HasRemainingPellets()
+    {
+        foreach (Transform pellet in pellets)
+        {
+            if (pellet.gameObject.activeSelf)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+
+
 
 }
